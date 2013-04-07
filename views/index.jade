@@ -1,0 +1,47 @@
+extends _layout
+
+block head
+  link( href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/3.0.2/css/font-awesome.min.css", 
+          rel="stylesheet")
+
+//- additional nav components
+block nav
+  li
+    a#play-btn
+      i.icon-play.icon-large
+  li#stop-btn
+    a
+      i.icon-pause.icon-large
+
+//- parts of the DOM before bootstrap .container
+block outer
+  .map-container
+    #map (Loading map...)
+
+block content
+
+block footer
+
+  //- icanhaz templates:
+  script#feedItem( type='text/html' )
+    .info
+      | info window
+
+  script( src='https://maps.googleapis.com/maps/api/js?key=#{ maps_api_key }&libraries=geometry&sensor=true',
+          type='text/javascript')
+  script( src='//cdnjs.cloudflare.com/ajax/libs/ICanHaz.js/0.10/ICanHaz.min.js',
+    type='text/javascript')
+  script( src="/socket.io/socket.io.js", type='text/javascript' )
+  != js('utils')
+  != js('client')
+  script( type='text/javascript' )
+    utils.globalPatches()
+    $(document).on('ready',function() {
+      $(document).ajaxStart(function() {
+        $('#navTop .spinner').show()
+      })
+      $(document).ajaxStop(function() {
+        $('#navTop .spinner').hide()
+      })
+      enoc.init()
+    })
