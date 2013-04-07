@@ -13,19 +13,18 @@ module.exports.listen = (server, sessionStore) ->
     socket.emit "test",
       hello: "world"
 
-    red = redis.createClient(config.redis_opts.port, config.redis_opts.host)
+    red = redis.createClient config.redis_opts.port, config.redis_opts.host
 
     red.on 'error', (err) ->
       console.log "Redis error: #{err}"
 
     socket.on 'sites', () ->
       console.log "Sites!"
-      red.getall "01", (err,resp) ->
-        socket.emit resp
+      socket.emit 'sites', meta
 
     socket.on "get_day", (data) ->
       console.log "Day!", socket.id, data
-      red.getall data.day, (err,resp) ->
+      red.hgetall data.key, (err,resp) ->
         console.log err,resp
         socket.emit "day", resp
 
