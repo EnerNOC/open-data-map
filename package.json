@@ -1,5 +1,5 @@
 {
-  "name": "open-data-viz",
+  "name": "open-data-map",
   "version": "0.0.0",
   "description": "EnerNOC customer timeline viz",
   "main": "server.coffee",
@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/EnerNOC/open-data-viz.git"
+    "url": "git://github.com/EnerNOC/open-data-map.git"
   },
   "keywords": [
     "maps", "energy"
