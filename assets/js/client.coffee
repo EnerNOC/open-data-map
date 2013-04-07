@@ -4,77 +4,118 @@ self.socket = io.connect(window.location.protocol + "//" + window.location.host)
 
 self.markers = {}
 self.day = new Date(2012,0,1)
+self.stop = false
+
+sq_ft_min = 500
+sq_ft_max = 1500000
+sq_ft_range = sq_ft_max - sq_ft_min
+icon_scale_min = 5
+icon_scale_max = 20
+icon_scale_range = icon_scale_max - icon_scale_min
+
+self.get_icon_size = (sq_ft) ->
+  parseInt (sq_ft - sq_ft_min) / sq_ft_range * icon_scale_range + icon_scale_min
+
+
+usage_min = 20e3
+usage_max = 30e6
+usage_range = usage_min - usage_max
+hsl_min = 190
+hsl_max = 360
+hsl_range = hsl_max - hsl_min
+
+self.get_HSL = (val) ->
+  v = parseInt( (val - hsl_min) / usage_range * hsl_range + hsl_min )
+  "hsl(#{v},100%,50%)"
+
 
 self.get_day = () ->
+  console.log "Day #{self.day}"
   self.socket.emit "get_day",
-    key: "#{self.day.getUTCMonth()}#{self.day.getUTCDay()}"
+    key: "#{self.day.getMonth()}#{self.day.getDate()}"
 
 
 self.socket.on "day", (data) ->
   console.log "day!"
-  for site in data.sites
-    self.update_marker site
-  self.day.setTime self.day.getTime + 60000 * 60 * 24
-  window.setTimeout self.get_day, 1000
-
-
-self.socket.on "sites", (data) ->
-  for site in data.sites
-    self.add_marker site
-
-self.socket.on "test", (d) ->
-  console.log "Socket test!", d
+  for id,reading of data
+    self.update_marker id,reading
+  $('#date').text self.day.toDateString()
+  self.day.setTime self.day.getTime() + 60000 * 60 * 24
+  window.setTimeout self.get_day, 1000 unless self.stop
 
 
 self.get_sites = () ->
-  socket.emit 'sites'
+  console.log "Get Sites!"
+  for id,marker of self.markers
+    marker.setMap null
+    delete self.markers[ id ]
+  self.socket.emit 'sites'
+
+
+self.socket.on "sites", (sites) ->
+  console.log "Sites!", sites
+  for id, site of sites
+    self.add_marker id, site
+
+
+self.add_marker = (id, site) ->
+  marker = new google.maps.Marker(
+    position: new google.maps.LatLng(site.lat_lng...)
+    icon: {
+      path: google.maps.SymbolPath.CIRCLE
+      fillOpacity: 0.5
+      fillColor: '#6e1' #'#19a'
+      strokeOpacity: 0.8
+      strokeColor: '#666'
+      strokeWeight: 1.2
+      scale: self.get_icon_size(site.sq_ft) #5 #pixels
+    }
+    animation: google.maps.Animation.DROP
+    map: self.map)
+  self.markers[id] = marker
+  # TODO add click handler for info window
+
+
+self.update_marker = (id,val) ->
+  marker = self.markers[id]
+#  color = '#'+parseInt(val).toString(16)
+  color = self.get_HSL parseInt( val )
+  console.log "setting color: #{color}"
+  marker.icon.fillColor = color
+  marker.notify 'icon'
+
 
 self.play = (evt) ->
   console.log "Play!"
+  self.stop = false
   self.day = new Date(2012,0,1)
-  self.get_day
+  self.get_day()
 
 
 self.stop = (evt) ->
   console.log "Stop!"
+  self.stop = true
   self.socket.emit "stop"
 
 
-self.add_marker = (site) ->
-  marker = new google.maps.Marker(
-    position: new google.maps.LatLng(site.lat,site.lng)
-    icon: {
-      path: google.maps.SymbolPath.CIRCLE
-      fillOpacity: 0.5
-      fillColor: '00ff00'
-      strokeOpacity: 1.0
-      strokeColor: 'fff000'
-      strokeWeight: 3.0
-      scale: 20 #pixels
-    }
-  map: self.map)
-  self.markers[site.id] = marker
-
-
-self.update_marker = (site) ->
-  existing = self.markers[site.id]
-  existing.icon.strokeColor = site.usage.toString(16)
+self.socket.on "test", (d) ->
+  console.log "Socket test!", d
 
 
 self.init = ->
   console.log "Init!"
   $('#play-btn').on 'click', self.play
   $('#stop-btn').on 'click', self.stop
+  $('#refresh-btn').on 'click', self.get_sites
 
   self.map = new google.maps.Map($("#map")[0],
-    scrollwheel: false
     styles: self.mapStyles
-    center: new google.maps.LatLng(33,-98)
-    zoom: 5
+    center: new google.maps.LatLng(34,-98)
     mapTypeId: google.maps.MapTypeId.ROADMAP
-    mapTypeControlOptions: {
-      style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
-    }
+    zoom: 4
+    scrollwheel: false
+    panControl: false
+    mapTypeControl: false
     zoomControlOptions: {
       style: google.maps.ZoomControlStyle.SMALL
     }
@@ -95,7 +136,8 @@ self.adjust_map_bounds = ->
 
 self.mapStyles = [
   { featureType: "all", stylers: [ saturation: 50 ] },
-  { featureType: 'administrative', stylers: [] },
+  { featureType: 'administrative', elementType: "labels", stylers: [{visibility:"off"}] },
+  { featureType: 'administrative.land_parcel', stylers: [{visibility:"off"}] },
   { featureType: 'all', elementType: 'labels' },
   { featureType: "road", stylers: [
       { hue: "#00ffee" },
@@ -109,9 +151,10 @@ self.mapStyles = [
     ]
   },
   { featureType: 'poi', stylers: [
-      { saturation: -50 }
+      { visibility: off }
     ]
   },
+  { featureType: 'landscape', stylers: [ { visibility: "off" } ] },
   # POIs create clickable labels that can't be intercepted...
-  { featureType: "poi", elementType: "labels", stylers: [ { visibility: "off" } ] }
+  { featureType: "poi", stylers: [ { visibility: "off" } ] }
 ]
