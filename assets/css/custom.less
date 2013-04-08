@@ -7,14 +7,6 @@
 	z-index: 1050 // keep this above dialog backdrop, which is 1040
 }
 
-.spinner { 
-	background: transparent url('../img/spinner.gif') no-repeat center center;
-	display: inline-block;
-	vertical-align: middle;
-	width: 26px;
-	height: 26px;
-}
-
 .navbar a.brand {
 	font-family:Futura,Moderna,Helvetica,sans-serif;
   color: #eee;
@@ -66,48 +58,6 @@
   border-radius: 4px;
 }
 
-#feedWindow {
-	form { margin: 0 }
-	ul.feed { margin:0 }
-	li.item { 
-		margin-top: 2px;
-		list-style: none;
-		border-bottom: solid 1px #ccc;
-		strong { margin-right: 4px }
-		p { margin: 0 }
-		.preview { margin-top:5px }
-	}
-	.title { 
-		line-height: 1.8em;
-		margin: 3px 12px
-	}
-}
-
-#searchWindow {
-	max-width: 25em;
-	.title { margin: 3px 0 }
-	ul { margin: 0 }
-  form { margin: 0 }
-  .modal-body { padding-top: 8px }
-  .modal-header { padding-bottom: 4px }
-	li { 
-		list-style: none;
-    padding: .2em 0;
-    .icon {
-      position: absolute;
-			width:20px;
-      height:20px;
-      background-color: #ccc;
-      background: linear-gradient(to bottom, rgba(197,222,234,1) 0%,rgba(138,187,215,1) 31%,rgba(6,109,171,1) 100%);
-      background: linear-gradient(to bottom, rgba(229,112,231,1) 0%,rgba(200,94,199,1) 47%,rgba(168,73,163,1) 100%);
-      border-radius: 4px
-    }
-    a {
-      display:block;
-      margin-left: 27px
-    }
-	}
-}
 
 @media (max-width: 979px) {
   .map-container {
