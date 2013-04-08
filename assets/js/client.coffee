@@ -72,12 +72,26 @@ self.add_marker = (id, site) ->
     }
     animation: google.maps.Animation.DROP
     map: self.map)
+  site.id = id
+  site.current_usage = "?"
+  marker.site_info = site
+  google.maps.event.addListener marker, "click", self.marker_clicked
   self.markers[id] = marker
-  # TODO add click handler for info window
+
+
+self.marker_clicked = (evt) ->
+  console.log "click", this
+  console.log "Marker clicked for site #{this.site_info.id}"
+  self.infoBubble.close() if self.infoBubble.isOpen()
+  self.infoBubble.setPosition new google.maps.LatLng(this.site_info.lat_lng...)
+  self.infoBubble.setContent ich.markerWindow( this.site_info )[0]
+  self.infoBubble.open()
 
 
 self.update_marker = (id,val) ->
   marker = self.markers[id]
+  v = (val/1000).toString()
+  marker.site_info.current_usage = v.split(v.indexOf('.')+2)[0]
 #  color = '#'+parseInt(val).toString(16)
   color = self.get_HSL parseInt( val )
   console.log "setting color: #{color}"
@@ -121,6 +135,18 @@ self.init = ->
     }
     streetViewControl: false
   )
+
+  self.infoBubble = new InfoBubble(
+      map: self.map
+      borderRadius: 6
+      arrowSize: 10
+      borderWidth: 2
+      borderColor: '#ccc'
+      arrowPosition: 30
+      arrowStyle: 0
+      disableAutoPan: true
+    )
+
   google.maps.event.addListenerOnce self.map, "tilesloaded", (evt) ->
     self.get_sites()
 

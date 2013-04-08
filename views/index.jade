@@ -32,14 +32,28 @@ block content
 block footer
 
   //- icanhaz templates:
-  script#feedItem( type='text/html' )
+  script#markerWindow( type='text/html' )
     .info
-      | info window
+      .label.label-info Site {{ id }}
+      h5 {{ sub_industry }}
+      .llabel.pull-right {{ industry }}
+      table
+        tr
+          td {{ sq_ft }} 
+          td.llabel sq ft
+        tr
+          td {{ current_usage }} 
+          td.llabel kWh
+        tr
+          td {{ tzo }}
+          td.llabel tzo
+
 
   script( src='https://maps.googleapis.com/maps/api/js?key=#{ maps_api_key }&libraries=geometry&sensor=true',
           type='text/javascript')
   script( src='//cdnjs.cloudflare.com/ajax/libs/ICanHaz.js/0.10/ICanHaz.min.js',
     type='text/javascript')
+  script( src="/javascripts/infobubble-compiled.js", type='text/javascript' )
   script( src="/socket.io/socket.io.js", type='text/javascript' )
   != js('utils')
   != js('client')
