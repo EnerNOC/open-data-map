@@ -30,13 +30,13 @@ self.get_HSL = (val) ->
 
 
 self.get_day = () ->
-  console.log "Day #{self.day}"
+#  console.log "Day #{self.day}"
   self.socket.emit "get_day",
     key: "#{self.day.getMonth()}#{self.day.getDate()}"
 
 
 self.socket.on "day", (data) ->
-  console.log "day!"
+#  console.log "day!"
   for id,reading of data
     self.update_marker id,reading
   $('#date').text self.day.toDateString()
@@ -53,7 +53,7 @@ self.get_sites = () ->
 
 
 self.socket.on "sites", (sites) ->
-  console.log "Sites!", sites
+#  console.log "Sites!", sites
   for id, site of sites
     self.add_marker id, site
 
@@ -80,8 +80,9 @@ self.add_marker = (id, site) ->
 
 
 self.marker_clicked = (evt) ->
-  console.log "click", this
-  console.log "Marker clicked for site #{this.site_info.id}"
+#  console.log "click", this
+#  console.log "Marker clicked for site #{this.site_info.id}"
+  self.selected_site_id = this.site_info.id
   self.infoBubble.close() if self.infoBubble.isOpen()
   self.infoBubble.setPosition new google.maps.LatLng(this.site_info.lat_lng...)
   self.infoBubble.setContent ich.markerWindow( this.site_info )[0]
@@ -90,11 +91,15 @@ self.marker_clicked = (evt) ->
 
 self.update_marker = (id,val) ->
   marker = self.markers[id]
-  v = (val/1000).toString()
-  marker.site_info.current_usage = v.split(v.indexOf('.')+2)[0]
-#  color = '#'+parseInt(val).toString(16)
+
+  usage = (val/1000).toString()
+  usage = usage.split( usage.indexOf('.') + 2 )[0]
+  marker.site_info.current_usage = usage
+  if id == self.selected_site_id
+    $('.info .usage').text usage # updated current usage
+
   color = self.get_HSL parseInt( val )
-  console.log "setting color: #{color}"
+#  console.log "setting color: #{color}"
   marker.icon.fillColor = color
   marker.notify 'icon'
 
