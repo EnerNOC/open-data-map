@@ -21,10 +21,10 @@ Recommended installation procedure from Mac with [Homebrew](http://mxcl.github.i
     npm install -g coffee-script
     npm install -g nodemon
 
-		# clone repo:
-		git clone git://github.com/EnerNOC/open-data-map.git
-		cd open-data-map
-		npm install # install project dependencies
+    # clone repo:
+    git clone git://github.com/EnerNOC/open-data-map.git
+    cd open-data-map
+    npm install # install project dependencies
 
 Then go to the `import` directory and follow those [README instructions](import/README.md)
 
