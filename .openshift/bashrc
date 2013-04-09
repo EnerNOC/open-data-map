@@ -1,0 +1,14 @@
+# make this run automatically when you login:
+# ssh 1234abcd@app-domain.rhcloud.com \
+#	  'echo ".  ~/app-root/repo/.openshift/bashrc" >> ~/app-root/data/.bash_profile' 
+#
+export PS1="\[\e]0;\w\a\]\n\[\e[32m\]$OPENSHIFT_GEAR_DNS \[\e[33m\]\w\[\e[0m\]\n\$ "
+
+alias ls='ls -G'
+alias l="ls -F"
+alias la='ls -AF'
+alias ll='ls -lhF'
+alias grep='grep --color=auto'
+
+export HISTCONTROL='ignoreboth'
+export HISTIGNORE="&: *:[bf]g:exit:logout"

@@ -1,0 +1,23 @@
+#!/bin/bash
+# This is a simple build script and will be executed on your CI system if 
+# available.  Otherwise it will execute while your application is stopped
+# before the deploy step.  This script gets executed directly, so it
+# could be python, php, ruby, etc.
+. ${OPENSHIFT_DATA_DIR}diy_env.sh
+cd ${OPENSHIFT_REPO_DIR}
+# link a 'permanent' node_modules from the data dir if node_modules is not 
+# checked into the project folder
+if [ ! -e ${OPENSHIFT_REPO_DIR}node_modules ]; then
+	mkdir -p ${OPENSHIFT_DATA_DIR}node_modules
+	ln -s ${OPENSHIFT_DATA_DIR}node_modules
+fi
+npm install
+# To keep node running if crashed
+which coffee &>/dev/null || npm install coffee-script -g
+which supervisor &>/dev/null || npm install supervisor -g
+
+# this is something that should be manually SCP'd to the data dir, then
+# it will be symlinked to the repo dir on every deploy.
+if [ -e ${OPENSHIFT_DATA_DIR}keys.js ]; then
+	ln -s ${OPENSHIFT_DATA_DIR}keys.js
+fi
