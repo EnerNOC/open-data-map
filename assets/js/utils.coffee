@@ -106,7 +106,7 @@ t("Hello {who}!", { who: "JavaScript" });
         i = 0
 
         while i < args.length and arg < arguments_.length
-          args[i] = arguments_[arg++]  if args[i] is `undefined`
+          args[i] = arguments_[arg++]  if args[i]?
           i++
         fn.apply this, args
 

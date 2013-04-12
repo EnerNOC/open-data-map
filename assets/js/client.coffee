@@ -4,7 +4,7 @@ self.socket = io.connect(window.location.protocol + "//" + window.location.host)
 
 self.markers = {}
 self.day = new Date(2012,0,1)
-self.stop = false
+self.stop = true
 
 sq_ft_min = 500
 sq_ft_max = 1500000
@@ -13,6 +13,8 @@ icon_scale_min = 5
 icon_scale_max = 20
 icon_scale_range = icon_scale_max - icon_scale_min
 
+
+# set icon diameter based on the square footage of the building
 self.get_icon_size = (sq_ft) ->
   parseInt (sq_ft - sq_ft_min) / sq_ft_range * icon_scale_range + icon_scale_min
 
@@ -24,17 +26,23 @@ hsl_min = 190
 hsl_max = 360
 hsl_range = hsl_max - hsl_min
 
+
+# attempt to pick a color value within a gradient range based on usage
 self.get_HSL = (val) ->
   v = parseInt( (val - hsl_min) / usage_range * hsl_range + hsl_min )
   "hsl(#{v},100%,50%)"
 
 
+# request a given days' usage
 self.get_day = () ->
 #  console.log "Day #{self.day}"
   self.socket.emit "get_day",
     key: "#{self.day.getMonth()}#{self.day.getDate()}"
 
 
+# socket response for 'get_day' - results are iterated
+# over to set the usage for each site. Response data is
+# a hash of {site_id : usage_val} pairs.
 self.socket.on "day", (data) ->
 #  console.log "day!"
   for id,reading of data
@@ -44,6 +52,7 @@ self.socket.on "day", (data) ->
   window.setTimeout self.get_day, 1000 unless self.stop
 
 
+# Called on page load to get all site markers
 self.get_sites = () ->
   console.log "Get Sites!"
   for id,marker of self.markers
@@ -52,12 +61,17 @@ self.get_sites = () ->
   self.socket.emit 'sites'
 
 
+# Socket response for site markers.  Response data is a
+# hash of {site_id : metadata} pairs.
 self.socket.on "sites", (sites) ->
 #  console.log "Sites!", sites
   for id, site of sites
     self.add_marker id, site
 
 
+# Called for each site that should be added to the map.
+# Drops a marker and adds a click handler to display an
+# info bubble of the site metadata.
 self.add_marker = (id, site) ->
   marker = new google.maps.Marker(
     position: new google.maps.LatLng(site.lat_lng...)
@@ -79,6 +93,7 @@ self.add_marker = (id, site) ->
   self.markers[id] = marker
 
 
+# Click handler for a marker to show an info bubble with site info
 self.marker_clicked = (evt) ->
 #  console.log "click", this
 #  console.log "Marker clicked for site #{this.site_info.id}"
@@ -89,6 +104,7 @@ self.marker_clicked = (evt) ->
   self.infoBubble.open()
 
 
+# Update a marker's color when usage changes.
 self.update_marker = (id,val) ->
   marker = self.markers[id]
 
@@ -104,23 +120,28 @@ self.update_marker = (id,val) ->
   marker.notify 'icon'
 
 
+# Handler called when the 'play' button is clicked.
 self.play = (evt) ->
+  return unless self.stop # already running
   console.log "Play!"
   self.stop = false
   self.day = new Date(2012,0,1)
   self.get_day()
 
 
+# Handler called when the stop button is clicked.
 self.stop = (evt) ->
   console.log "Stop!"
   self.stop = true
   self.socket.emit "stop"
 
 
+# Server emits a 'test' event when socket is initialized.
 self.socket.on "test", (d) ->
   console.log "Socket test!", d
 
 
+# Called on page load.
 self.init = ->
   console.log "Init!"
   $('#play-btn').on 'click', self.play
@@ -142,15 +163,15 @@ self.init = ->
   )
 
   self.infoBubble = new InfoBubble(
-      map: self.map
-      borderRadius: 6
-      arrowSize: 10
-      borderWidth: 2
-      borderColor: '#ccc'
-      arrowPosition: 30
-      arrowStyle: 0
-      disableAutoPan: true
-    )
+    map: self.map
+    borderRadius: 6
+    arrowSize: 10
+    borderWidth: 2
+    borderColor: '#ccc'
+    arrowPosition: 30
+    arrowStyle: 0
+    disableAutoPan: true
+  )
 
   google.maps.event.addListenerOnce self.map, "tilesloaded", (evt) ->
     self.get_sites()
@@ -159,6 +180,7 @@ self.init = ->
   self.adjust_map_bounds()
 
 
+# Called on window resize to cause the map to fill the whole page.
 self.adjust_map_bounds = ->
   map = $("#map")
   map.height window.innerHeight - 40

@@ -25,7 +25,7 @@ app.configure "development", ->
   )
 
 app.get "/", (req, res) ->
-  res.render "index", maps_api_key : keys.maps_api_key
+  res.render "index", config.layout_vars
 
 quit = (sig) ->
   if typeof sig is "string"
@@ -41,7 +41,8 @@ process.on "exit", ->
   process.on "SIG#{sig}", ->
     quit "SIG#{sig}"
 
-# Run server  
+# Run server
 server.listen config.listen_port, config.listen_ip, ->
-  console.log "%s: Node (version: %s) %s started on %s:%d ...", Date(Date.now()), process.version, process.argv[1], config.listen_ip, config.listen_port
+  console.log "%s: Node (version: %s) %s started on %s:%d ...", Date(Date.now()),
+    process.version, process.argv[1], config.listen_ip, config.listen_port
 
