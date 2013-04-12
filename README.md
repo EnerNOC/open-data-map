@@ -9,6 +9,8 @@ visualizes energy usage data from [EnerNOC Open](http://open.enernoc.com/data).
 
 ## Installation
 
+[![build status](https://secure.travis-ci.org/EnerNOC/open-data-map.png)](http://travis-ci.org/EnerNOC/open-data-map)
+
 The app uses [Node.js](http://nodejs.org), CoffeeScript and [Redis](http://redis.io) > 2.6.
 
 Recommended installation procedure from Mac with [Homebrew](http://mxcl.github.io/homebrew/):

@@ -22,9 +22,6 @@
 		"grunt-coffeelint": "0.0.6",
 		"grunt-ssh": "0.3.1"
   },
-  "peerDependencies": {
-    "grunt": "~0.4"
-  },
   "scripts": {
     "lint": "grunt coffeelint",
     "test": "grunt coffeelint",
