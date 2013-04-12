@@ -1,0 +1,6 @@
+{
+  "host": "myapp-namespace.rhcloud.com",
+  "username": "< use `rhc app show myapp` to see ssh info",
+  "privateKey": "/absolute/path/to/.ssh/id_rsa",
+  "passphrase": "passphrase to decrypt SSH key"
+}
