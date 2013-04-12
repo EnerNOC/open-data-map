@@ -2,6 +2,7 @@
   "name": "open-data-map",
   "version": "0.0.0",
   "description": "EnerNOC customer timeline viz",
+  "homepage": "https://github.com/enernoc/open-data-map",
   "main": "server.coffee",
   "dependencies": {
     "express": "3.0.6",
@@ -16,19 +17,32 @@
     "redis": "*"
   },
   "devDependencies": {
-    "coffee-script": "1.4.0"
+    "coffee-script": "1.4.0",
+    "grunt": "~0.4.1",
+		"grunt-coffeelint": "0.0.6",
+		"grunt-ssh": "0.3.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "grunt coffeelint",
+    "test": "grunt coffeelint",
     "start": "coffee server.coffee"
+  },
+  "engines": {
+    "node": "*"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/EnerNOC/open-data-map.git"
   },
+  "bugs": {
+    "url": "https://github.com/enernoc/open-data-map/issues"
+  },
   "keywords": [
     "maps", "energy"
   ],
-  "author": "Thom Nichols <tnichols@enernoc.com>",
+  "author": {
+  	"name" : "Thom Nichols",
+  	"email" : "tnichols@enernoc.com"
+	},
   "license": "BSD"
 }
