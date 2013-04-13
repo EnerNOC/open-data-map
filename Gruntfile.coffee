@@ -8,25 +8,43 @@ module.exports = (grunt) ->
       options: grunt.file.readJSON(".coffeelintrc")
 
     sftp:
+      options:
+        banner: "Uploading <%= files %> to <%= host %>"
+        host: ssh_opts.host
+        username: ssh_opts.user
+        privateKey: ssh_opts.key
+        mkdirs: true
+
       keys:
         files:
-          "./": "keys,js"
-
+          "./": "keys.js"
         options:
           path: "app-root/data/"
-          host: ssh_opts.host
-          username: ssh_opts.user
-          privateKey: ssh_opts.key
+
+      data:
+        files:
+          "./import": "csv-only.tar.gz"
+        options:
+          path: "app-root/data/import/"
 
     sshexec:
+      options:
+        banner: "Executing: <%= command %>"
+        host: ssh_opts.host
+        username: ssh_opts.user
+        privateKey: ssh_opts.key
+
       keys:
         command: "cd appt-root/runtime/repo;ln -s ../../data/keys.js ."
-        options:
-          host: ssh_opts.host
-          username: ssh_opts.user
-          privateKey: ssh_opts.key
+
+      data:
+        command: "cd app-root/data/import; tar -xzf csv-only.tar.gz ."
+
 
   grunt.loadNpmTasks "grunt-coffeelint"
   grunt.loadNpmTasks "grunt-ssh"
 
   grunt.registerTask "default", ["coffeelint"]
+  grunt.registerTask "keys", ["sftp:keys","sshexec:keys"]
+  grunt.registerTask "data", ["sftp:data","sshexec:data"]
+  
